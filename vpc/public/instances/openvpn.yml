@@ -1,0 +1,74 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Install OpenVpn Public Key
+      shell: wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg|apt-key add -
+    - name: Add OpenVPN official repository
+      shell: echo "deb http://build.openvpn.net/debian/openvpn/stable focal main" > /etc/apt/sources.list.d/openvpn-repo.list   
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+    - name: Install iptables-persistant
+      apt:
+        name: iptables-persistent  
+    - name: Install OpenVPN
+      apt:
+        name: openvpn=2.5.3-focal0
+    - name: Create pki root folder    
+      ansible.builtin.file:
+        path: "/etc/openvpn/pki"
+        state: directory
+        mode: '0700'
+        owner: ubuntu
+        group: ubuntu
+    - name: Copy ca.crt    
+      ansible.builtin.copy:
+        src: "{{tf_ca_crt}}"
+        dest: "/etc/openvpn/pki/ca.crt"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
+    - name: Copy server.crt    
+      ansible.builtin.copy:
+        src: "{{tf_server_crt}}"
+        dest: "/etc/openvpn/pki/server.crt"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
+    - name: Copy server.key    
+      ansible.builtin.copy:
+        src: "{{tf_server_key}}"
+        dest: "/etc/openvpn/pki/server.key"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
+    - name: Copy static.key    
+      ansible.builtin.copy:
+        src: "{{tf_server_static_key}}"
+        dest: "/etc/openvpn/pki/static.key"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'                
+    - name: Copy OpenVpn config    
+      ansible.builtin.copy:
+        src: "{{tf_cwd}}/openvpn.conf"
+        dest: "/etc/openvpn/server/server.conf"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0400'
+    - name: Setting up OpenVpn server directive    
+      shell: echo "server {{tf_vpn_subnet}}" >> /etc/openvpn/server/server.conf       
+    - name: Setting up push directive
+      shell: echo "push \"route {{item}}\"" >> /etc/openvpn/server/server.conf
+      loop: "{{ tf_push_routes }}"
+    - name: Setting up dns server    
+      shell: echo "push \"dhcp-option DNS {{tf_dns_server}}\"" >> /etc/openvpn/server/server.conf         
+    - name: Enable IpV4 forwarding
+      shell: echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
+    - name: Setting up nat to masquerade requests from vpn clients
+      shell: 
+        cmd: |
+          int=$(ip route list default | cut -d ' ' -f5)
+          iptables -t nat -I POSTROUTING -s {{ tf_vpn_subnet }} -o $int -j MASQUERADE
+          iptables-save > /etc/iptables/rules.v4
+    - name: Starting OpenVpn
+      shell: systemctl restart openvpn-server@server      
