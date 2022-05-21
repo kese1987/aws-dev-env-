@@ -1,0 +1,4 @@
+- name: Installing Nexus, exposing on port 9090
+  shell: |
+    mkdir /usr/nexus-data && chmod -R 777 /usr/nexus-data
+    docker run -d -p 9090:8081 -v /usr/nexus-data:/nexus-data --name nexus sonatype/nexus

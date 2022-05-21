@@ -16,8 +16,8 @@ module "public-net" {
   az       = var.az
 }
 
-module "public-instances" {
-  source     = "./public/instances"
+module "public-instances-openvpn" {
+  source     = "./public/instances/openvpn"
   vpc-id   = aws_vpc.enricos-vpc.id
   known-key-pairs = var.known-key-pairs
   instance-config = {
