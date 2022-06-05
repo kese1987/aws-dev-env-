@@ -43,10 +43,10 @@ module "private-net" {
   public-nat-gw-id = module.public-net.nat-gw-id
   az               = var.az
   subnets          = {
-    default = {
+    private-subnet = {
       cidr-block = "10.0.64.0/18"
     }
-    vpn-client = {
+    vpn-clients = {
       cidr-block = "10.0.128.0/24"
     }        
   }

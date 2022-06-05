@@ -5,4 +5,8 @@ resource "aws_subnet" "private-subnets" {
   vpc_id            = var.vpc-id
   cidr_block        = each.value.cidr-block
   availability_zone = var.az
+
+  tags = {
+    Name = each.key
+  }
 }
