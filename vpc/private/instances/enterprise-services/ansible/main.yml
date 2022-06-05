@@ -1,0 +1,5 @@
+- hosts: all
+  become: true
+  tasks:
+    - include_tasks: docker.yml
+    - include_tasks: nexus.yml

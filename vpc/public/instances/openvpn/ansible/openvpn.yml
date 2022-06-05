@@ -53,7 +53,7 @@
     group: ubuntu
     mode: '0400'
 - name: Setting up OpenVpn server directive
-  shell: echo "server {{tf_vpn_subnet}}" >> /etc/openvpn/server/server.conf
+  shell: echo "server {{tf_vpn_network}} {{tf_vpn_subnet}}" >> /etc/openvpn/server/server.conf
 - name: Setting up push directive
   shell: echo "push \"route {{item}}\"" >> /etc/openvpn/server/server.conf
   loop: "{{ tf_push_routes }}"

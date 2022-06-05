@@ -1,6 +1,6 @@
 resource "aws_instance" "openvpn" {
   ami           = "ami-0d527b8c289b4af7f"
-  instance_type = "t2.medium"
+  instance_type = "t2.micro"
 
   availability_zone = var.instance-config.openvpn.az
   subnet_id         = var.instance-config.openvpn.subnet
@@ -21,7 +21,9 @@ resource "aws_instance" "openvpn" {
 
 resource "local_file" "openvpn_ansible_vars" {
   content = <<-DOC
-    tf_vpn_subnet: ${var.instance-config.openvpn.vpn-subnet}
+    tf_vpn_subnet: ${cidrnetmask(var.instance-config.openvpn.vpn-network-cidr)}
+    tf_vpn_network: ${regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}",var.instance-config.openvpn.vpn-network-cidr)}
+    tf_vpn_cidr: ${var.instance-config.openvpn.vpn-network-cidr}
     tf_cwd: ${abspath(path.module)}/ansible
     tf_ca_crt: ${var.instance-config.openvpn.ca-crt}
     tf_server_crt: ${var.instance-config.openvpn.server-crt}
@@ -71,14 +73,6 @@ resource "aws_security_group" "openvpn-sg" {
   ingress {
     from_port        = 22
     to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-
-  ingress {
-    from_port        = 9090
-    to_port          = 9090
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]

@@ -26,7 +26,7 @@ module "public-instances-openvpn" {
         az = var.az
         subnet = module.public-net.subnets[0]
         eip = module.public-net.eips.vpn
-        vpn-subnet = "10.0.128.0 255.255.255.0"
+        vpn-network-cidr = "10.0.128.0/24"
         push-routes = jsonencode(["10.0.0.0 255.255.192.0", "10.0.64.0 255.255.192.0"])
         dns-server = "10.0.0.2 255.255.192.0"
       }), 
