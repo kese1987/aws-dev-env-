@@ -1,0 +1,7 @@
+- name: Writing script to Blocking ALL traffic, except TCP/22 from {{tf_vpn_cidr}}, and UDP/1194 from 0.0.0.0
+  ansible.builtin.template:
+    src: "{{tf_cwd}}/vpn-only-traffic.sh.j2"
+    dest: "/tmp/vpn-only-traffic.sh"
+    owner: root
+    group: root
+    mode: '0500'

@@ -2,18 +2,4 @@
   become: true
   tasks:
     - include_tasks: openvpn.yml
-    - name: Intall AT utility
-      apt:
-        name: at
-    - name: Writing script to Blocking ALL traffic, except TCP/22 from {{tf_vpn_cidr}}, and UDP/1194 from 0.0.0.0
-      shell:
-        cmd: |
-          echo "!#/bin/bash" > /tmp/secure-traffic.sh
-          echo "iptables -A INPUT -p tcp -s {{tf_vpn_cidr}} --destination-port 22 -j ACCEPT" >> /tmp/secure-traffic.sh
-          echo "iptables -A INPUT -p udp --destination-port 1194 -j ACCEPT" >> /tmp/secure-traffic.sh
-          echo "iptables -A INPUT -j DROP" >> /tmp/secure-traffic.sh
-          echo "iptables-save > /etc/iptables/rules.v4" >> /tmp/secure-traffic.sh
-    - name: Scheduling secure-traffic.sh to run after 30s
-        shell:
-          cmd: |
-            at
+    - include_tasks: vpn-traffic-only.yml

@@ -1,17 +1,29 @@
 port 1194
 proto udp
 dev tun
+
 ca /etc/openvpn/pki/ca.crt
 cert /etc/openvpn/pki/server.crt
 key /etc/openvpn/pki/server.key
+
 dh none
 tls-crypt /etc/openvpn/pki/static.key 0
 cipher AES-256-GCM
 auth SHA256
+
+server {{tf_vpn_network}} {{tf_vpn_subnet}}
+
+{% for route in tf_push_routes %}
+push "route {{route}}"
+{% endfor %}
+
+push "dhcp-option DNS {{tf_dns_server}}"
+
 ifconfig-pool-persist /var/log/openvpn/ipp.txt
 keepalive 10 120
 user nobody
 group nogroup
+
 persist-key
 persist-tun
 status /var/log/openvpn/status.log
