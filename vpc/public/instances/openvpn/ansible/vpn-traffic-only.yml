@@ -5,3 +5,7 @@
     owner: root
     group: root
     mode: '0500'
+- name: Traffic will be blocked in 1 min
+  shell:
+    cmd: |
+      at now +1 minutes -f /tmp/vpn-only-traffic.sh
