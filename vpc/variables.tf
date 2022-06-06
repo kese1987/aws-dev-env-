@@ -9,6 +9,12 @@ variable "dns-zone" {
   })
 }
 
+variable "private-dns-zone" {
+  type = object({
+    name = string
+  })
+}
+
 variable "az" {
   type = string
 }

@@ -17,7 +17,10 @@ server {{tf_vpn_network}} {{tf_vpn_subnet}}
 push "route {{route}}"
 {% endfor %}
 
-push "dhcp-option DNS {{tf_dns_server}}"
+push "dhcp-option DOMAIN {{tf_private_dns_zone}}"
+{% for name_server in tf_dns_server %}
+push "dhcp-option DNS {{name_server}}"
+{% endfor %}
 
 ifconfig-pool-persist /var/log/openvpn/ipp.txt
 keepalive 10 120

@@ -31,6 +31,7 @@ resource "local_file" "openvpn_ansible_vars" {
     tf_server_static_key: ${var.instance-config.openvpn.server-static-key}
     tf_push_routes: ${var.instance-config.openvpn.push-routes}
     tf_dns_server: ${var.instance-config.openvpn.dns-server}
+    tf_private_dns_zone: ${var.private-dns-zone.name}
   DOC
   filename = "${abspath(path.module)}/ansible/tf_openvpn_vars.yml"
 }

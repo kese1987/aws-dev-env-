@@ -18,6 +18,9 @@ module "vpc" {
     id   = data.aws_route53_zone.francierika-click.id
     name = data.aws_route53_zone.francierika-click.name
   }
+  private-dns-zone = {
+    name = "francierika.lan"
+  }
   known-key-pairs = local.known-key-pairs
   instance-config = {
     openvpn={

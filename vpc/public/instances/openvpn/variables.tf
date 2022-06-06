@@ -11,3 +11,17 @@ variable "known-key-pairs" {
   type = map(any)
 }
 
+variable "private-dns-zone" {
+  type=object({
+    name=string
+    id=string
+  })
+}
+
+variable "public-dns-zone" {
+  type=object({
+    name=string
+    id=string
+  })
+}
+

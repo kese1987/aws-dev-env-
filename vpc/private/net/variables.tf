@@ -13,3 +13,9 @@ variable "az" {
 variable "subnets" {
   type = map(any)
 }
+
+variable "dns-zone" {
+  type=object({
+    name=string
+  })
+}
