@@ -53,12 +53,15 @@
     group: ubuntu
     mode: '0400'
 - name: Enable IpV4 forwarding
-  shell: echo "net.ipv4.ip_forward=1" > /etc/sysctl.conf
+  shell:
+    cmd: |
+      echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+      sysctl -p
 - name: Setting up nat to masquerade requests from vpn clients
   shell:
     cmd: |
       int=$(ip route list default | cut -d ' ' -f5)
-      iptables -t nat -I POSTROUTING -s {{ tf_vpn_subnet }} -o $int -j MASQUERADE
+      iptables -t nat -I POSTROUTING -s {{ tf_vpn_cidr }} -o $int -j MASQUERADE
       iptables-save > /etc/iptables/rules.v4
 - name: Starting OpenVpn
   shell: systemctl restart openvpn-server@server

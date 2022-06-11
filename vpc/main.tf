@@ -6,14 +6,6 @@ resource "aws_vpc" "enricos-vpc" {
   }
 }
 
-resource "aws_route53_zone" "private-zone" {
-  name = var.private-dns-zone.name
-
-  vpc {
-    vpc_id = aws_vpc.enricos-vpc.id
-  }
-}
-
 ##############################################
 ############### PUBLIC #######################
 
@@ -62,7 +54,7 @@ module "public-instances" {
         eip = module.public-net.eips.vpn
         vpn-network-cidr = "10.0.128.0/24"
         push-routes = jsonencode(["10.0.0.0 255.255.192.0", "10.0.64.0 255.255.192.0"])
-        dns-server = jsonencode(concat(aws_route53_zone.private-zone.name_servers, ["10.0.0.2"]))
+        dns-server = jsonencode(["10.0.0.2"])
       }),
       var.instance-config.openvpn)
   }

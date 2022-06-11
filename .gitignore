@@ -3,3 +3,6 @@
 *.iml
 
 *.backup
+*.tfstate
+*.hcl
+*.info

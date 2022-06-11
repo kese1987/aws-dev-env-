@@ -5,9 +5,10 @@ resource "aws_instance" "openvpn" {
   availability_zone = var.instance-config.openvpn.az
   subnet_id         = var.instance-config.openvpn.subnet
   key_name          = var.known-key-pairs[var.instance-config.openvpn.key-name].key-name
-  security_groups =  [aws_security_group.openvpn-sg.id] 
+  security_groups =  [aws_security_group.openvpn-sg.id]
+  source_dest_check = false
 
-  tags = {
+tags = {
     Name = "OpenVpn"
   }
 
@@ -83,6 +84,14 @@ resource "aws_security_group" "openvpn-sg" {
     from_port        = 1194
     to_port          = 1194
     protocol         = "udp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    from_port = -1
+    to_port = -1
+    protocol = "icmp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
