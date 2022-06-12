@@ -1,5 +1,5 @@
 output "subnets" {
-  value = [aws_subnet.public-subnet.id]
+  value = [for k,v in var.subnets :  aws_subnet.public-subnets[k].id]
 }
 
 output "nat-gw-id" {

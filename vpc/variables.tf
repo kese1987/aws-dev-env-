@@ -15,6 +15,24 @@ variable "private-dns-zone" {
   })
 }
 
+variable "vpc_dns" {
+  type = string
+}
+variable "vpc_cidr_block" {
+  type = string
+}
+
+variable "vpc-subnets" {
+  type = object ({
+    private = map(any)
+    public  = map(any)
+  })
+}
+
+variable "primary-public-subnet" {
+  type = string
+}
+
 variable "az" {
   type = string
 }

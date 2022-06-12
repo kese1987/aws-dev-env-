@@ -2,4 +2,4 @@
   become: true
   tasks:
     - include_tasks: openvpn.yml
-#    - include_tasks: vpn-traffic-only.yml
+    - include_tasks: vpn-traffic-only.yml

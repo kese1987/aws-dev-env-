@@ -1,10 +1,10 @@
 resource "aws_nat_gateway" "public" {
   allocation_id     = aws_eip.nat.id
-  subnet_id         = aws_subnet.public-subnet.id
+  subnet_id         = aws_subnet.public-subnets[var.primary-public-subnet].id
   connectivity_type = "public"
 
   tags = {
-    Name = "public Nat gw"
+    Name = "public nat gw"
   }
 
   # To ensure proper ordering, it is recommended to add an explicit dependency

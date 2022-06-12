@@ -1,5 +1,5 @@
 resource "aws_vpc" "enricos-vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr_block
   enable_dns_hostnames = true
   tags = {
     Name = "enricos-vpc"
@@ -14,6 +14,8 @@ module "public-net" {
   dns-zone = var.dns-zone
   vpc-id   = aws_vpc.enricos-vpc.id
   az       = var.az
+  subnets  = var.vpc-subnets.public
+  primary-public-subnet = var.primary-public-subnet
 }
 
 ##############################################
@@ -25,14 +27,7 @@ module "private-net" {
   public-nat-gw-id = module.public-net.nat-gw-id
   az               = var.az
   dns-zone         = var.private-dns-zone
-  subnets          = {
-    private-subnet = {
-      cidr-block = "10.0.64.0/18"
-    }
-    vpn-clients = {
-      cidr-block = "10.0.128.0/24"
-    }        
-  }
+  subnets          = var.vpc-subnets.private
 }
 
 ############## PUBLIC INSTANCES #########################
@@ -52,9 +47,8 @@ module "public-instances" {
         az = var.az
         subnet = module.public-net.subnets[0]
         eip = module.public-net.eips.vpn
-        vpn-network-cidr = "10.0.128.0/24"
-        push-routes = jsonencode(["10.0.0.0 255.255.192.0", "10.0.64.0 255.255.192.0"])
-        dns-server = jsonencode(["10.0.0.2"])
+        routes = jsonencode([for route_cidr in var.instance-config.openvpn.push-routes : format("%s %s", regex("\\d+\\.\\d+\\.\\d+\\.\\d+", route_cidr), cidrnetmask(route_cidr))])
+        dns-server = var.vpc_dns
       }),
       var.instance-config.openvpn)
   }

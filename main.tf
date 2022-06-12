@@ -21,9 +21,29 @@ module "vpc" {
   private-dns-zone = {
     name = "francierika.lan"
   }
+  vpc_cidr_block = "10.0.0.0/16"
+  vpc_dns = "10.0.0.2"
+  vpc-subnets = {
+    private = {
+      private-subnet = {
+        cidr-block = "10.0.64.0/18"
+      }
+      vpn-clients = {
+        cidr-block = "10.0.128.0/24"
+      }
+    }
+    public = {
+      public-subnet = {
+        cidr-block = "10.0.0.0/18"
+      }
+    }
+  }
+  primary-public-subnet = "public-subnet"
   known-key-pairs = local.known-key-pairs
   instance-config = {
     openvpn={
+      vpn-network-cidr = "10.0.128.0/24"
+      push-routes = ["10.0.64.0/18", "10.0.128.0/24", "10.0.0.0/18"]
       key-name = "enrico-mbp"
       ca-crt = "/usr/local/etc/pki/ca.crt"
       server-crt = "/usr/local/etc/pki/issued/openvpn-server.crt"

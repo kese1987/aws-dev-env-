@@ -17,9 +17,7 @@ server {{tf_vpn_network}} {{tf_vpn_subnet}}
 push "route {{route}}"
 {% endfor %}
 
-{% for name_server in tf_dns_server %}
-push "dhcp-option DNS {{name_server}}"
-{% endfor %}
+push "dhcp-option DNS {{tf_dns_server}}"
 push "dhcp-option DNS 8.8.8.8"
 push "dhcp-option DOMAIN {{tf_private_dns_zone}}"
 
