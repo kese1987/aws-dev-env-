@@ -15,7 +15,7 @@ variable "subnets" {
 }
 
 variable "dns-zone" {
-  type=object({
-    name=string
+  type = object({
+    name = string
   })
 }

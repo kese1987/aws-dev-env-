@@ -2,28 +2,26 @@ resource "aws_instance" "openvpn" {
   ami           = "ami-0d527b8c289b4af7f"
   instance_type = "t2.micro"
 
-  availability_zone = var.instance-config.openvpn.az
-  subnet_id         = var.instance-config.openvpn.subnet
-  key_name          = var.known-key-pairs[var.instance-config.openvpn.key-name].key-name
-  security_groups =  [aws_security_group.openvpn-sg.id]
-  source_dest_check = false
+  availability_zone      = var.instance-config.openvpn.az
+  subnet_id              = var.instance-config.openvpn.subnet
+  key_name               = var.known-key-pairs[var.instance-config.openvpn.key-name].key-name
+  vpc_security_group_ids = [aws_security_group.openvpn-sg.id]
+  source_dest_check      = false
 
-tags = {
+  tags = {
     Name = "OpenVpn"
   }
 
   #local provisioner get executed without checking the availability of the actual resource to configure
   #to overcome this limitation, and knowing that remote-exec is executed before the local-exec, and it wait
   #for the resource to be available, we setup a dummy remote execution.
-  
 
-  depends_on = [aws_security_group.openvpn-sg]
 }
 
 resource "local_file" "openvpn_ansible_vars" {
-  content = <<-DOC
+  content  = <<-DOC
     tf_vpn_subnet: ${cidrnetmask(var.instance-config.openvpn.vpn-network-cidr)}
-    tf_vpn_network: ${regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}",var.instance-config.openvpn.vpn-network-cidr)}
+    tf_vpn_network: ${regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}", var.instance-config.openvpn.vpn-network-cidr)}
     tf_vpn_cidr: ${var.instance-config.openvpn.vpn-network-cidr}
     tf_cwd: ${abspath(path.module)}/ansible
     tf_ca_crt: ${var.instance-config.openvpn.ca-crt}
@@ -37,11 +35,12 @@ resource "local_file" "openvpn_ansible_vars" {
   filename = "${abspath(path.module)}/ansible/tf_openvpn_vars.yml"
 }
 
-resource "null_resource" "openvpn-config"{
+resource "null_resource" "openvpn-config" {
 
   triggers = {
-    always_run = "${timestamp()}"
+    policy_sha1 = sha1(join("", tolist([for f in fileset("${path.module}/ansible/", "*") : file("${path.module}/ansible/${f}")])))
   }
+
   provisioner "remote-exec" {
     inline = ["echo \"instance ready!\""]
 
@@ -69,8 +68,8 @@ resource "aws_eip_association" "openvpn-assoc" {
 }
 
 resource "aws_security_group" "openvpn-sg" {
-  name        = "openvpn-sg"
-  vpc_id      = var.vpc-id
+  name   = "openvpn-sg"
+  vpc_id = var.vpc-id
 
   ingress {
     from_port        = 22
@@ -89,9 +88,9 @@ resource "aws_security_group" "openvpn-sg" {
   }
 
   ingress {
-    from_port = 8
-    to_port = -1
-    protocol = "icmp"
+    from_port        = 8
+    to_port          = -1
+    protocol         = "icmp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }

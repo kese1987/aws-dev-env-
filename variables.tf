@@ -6,9 +6,9 @@ variable "aws-region" {
 locals {
   known-key-pairs = {
     enrico-mbp = {
-      key-name="enrico-mbp"
-      private-key-file="/Users/enrico/.ssh/id_rsa"
-      public-key=file("/Users/enrico/.ssh/id_rsa.pub")
+      key-name         = "enrico-mbp"
+      private-key-file = "/Users/enrico/.ssh/id_rsa"
+      public-key       = file("/Users/enrico/.ssh/id_rsa.pub")
     }
   }
 }

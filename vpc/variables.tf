@@ -23,7 +23,7 @@ variable "vpc_cidr_block" {
 }
 
 variable "vpc-subnets" {
-  type = object ({
+  type = object({
     private = map(any)
     public  = map(any)
   })
@@ -42,5 +42,5 @@ variable "known-key-pairs" {
 }
 
 variable "instance-config" {
-    type = map(any)
+  type = map(any)
 }

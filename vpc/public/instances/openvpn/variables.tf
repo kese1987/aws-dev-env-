@@ -12,16 +12,16 @@ variable "known-key-pairs" {
 }
 
 variable "private-dns-zone" {
-  type=object({
-    name=string
-    id=string
+  type = object({
+    name = string
+    id   = string
   })
 }
 
 variable "public-dns-zone" {
-  type=object({
-    name=string
-    id=string
+  type = object({
+    name = string
+    id   = string
   })
 }
 

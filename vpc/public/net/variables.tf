@@ -1,8 +1,8 @@
 variable "dns-zone" {
-    type=object({
-        id=string
-        name=string
-    })
+  type = object({
+    id   = string
+    name = string
+  })
 }
 
 variable "subnets" {
@@ -10,11 +10,11 @@ variable "subnets" {
 }
 
 variable "vpc-id" {
-  type=string
+  type = string
 }
 
 variable "az" {
-  type=string
+  type = string
 }
 
 variable "primary-public-subnet" {

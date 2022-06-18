@@ -5,7 +5,6 @@ resource "aws_instance" "openvpn" {
   availability_zone = var.instance-config.openvpn.az
   subnet_id         = var.instance-config.openvpn.subnet
   key_name          = var.known-key-pairs[var.instance-config.openvpn.key-name].key-name
-  security_groups =  [aws_security_group.openvpn-sg.id]
 
   tags = {
     Name = "EnterpriseServicesInstance"

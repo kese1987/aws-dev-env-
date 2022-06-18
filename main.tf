@@ -22,7 +22,7 @@ module "vpc" {
     name = "francierika.lan"
   }
   vpc_cidr_block = "10.0.0.0/16"
-  vpc_dns = "10.0.0.2"
+  vpc_dns        = "10.0.0.2"
   vpc-subnets = {
     private = {
       private-subnet = {
@@ -39,18 +39,18 @@ module "vpc" {
     }
   }
   primary-public-subnet = "public-subnet"
-  known-key-pairs = local.known-key-pairs
+  known-key-pairs       = local.known-key-pairs
   instance-config = {
-    openvpn={
-      vpn-network-cidr = "10.0.128.0/24"
-      push-routes = ["10.0.64.0/18", "10.0.128.0/24", "10.0.0.0/18"]
-      key-name = "enrico-mbp"
-      ca-crt = "/usr/local/etc/pki/ca.crt"
-      server-crt = "/usr/local/etc/pki/issued/openvpn-server.crt"
+    openvpn = {
+      vpn-network-cidr   = "10.0.128.0/24"
+      push-routes        = ["10.0.64.0/18", "10.0.128.0/24", "10.0.0.0/18"]
+      key-name           = "enrico-mbp"
+      ca-crt             = "/usr/local/etc/pki/ca.crt"
+      server-crt         = "/usr/local/etc/pki/issued/openvpn-server.crt"
       server-private-key = "/usr/local/etc/pki/private/openvpn-server.key"
-      server-static-key = "/usr/local/etc/pki/ta.key"
+      server-static-key  = "/usr/local/etc/pki/ta.key"
     }
   }
-  
+
   az = data.aws_availability_zones.available.names[0]
 }

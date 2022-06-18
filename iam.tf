@@ -19,21 +19,21 @@ resource "aws_iam_group_policy_attachment" "administrators-given-policy-fullacce
 
 ##### eks cluster role
 resource "aws_iam_role" "eksClusterRole" {
-  name = "eksClusterRole"
+  name                = "eksClusterRole"
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"]
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    "Statement": [
+    "Statement" : [
       {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": [
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : [
             "eks.amazonaws.com"
           ]
         },
-        "Action": "sts:AssumeRole"
+        "Action" : "sts:AssumeRole"
       }
     ]
   })
