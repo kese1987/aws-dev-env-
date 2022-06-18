@@ -51,7 +51,8 @@ module "vpc" {
       server-static-key  = "/usr/local/etc/pki/ta.key"
     }
     internal_tools = {
-      key-name           = "enrico-mbp"
+      key-name        = "enrico-mbp",
+      subnet_tag_name = "private-subnet"
     }
   }
 
