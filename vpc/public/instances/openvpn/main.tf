@@ -32,7 +32,7 @@ resource "local_file" "openvpn_ansible_vars" {
     tf_dns_server: ${var.instance-config.openvpn.dns-server}
     tf_private_dns_zone: ${var.private-dns-zone.name}
   DOC
-  filename = "${abspath(path.module)}/ansible/tf_openvpn_vars.yml"
+  filename = "${abspath(path.module)}/ansible/vars/tf_openvpn_vars.yml"
 }
 
 resource "null_resource" "openvpn-config" {
@@ -40,7 +40,6 @@ resource "null_resource" "openvpn-config" {
   triggers = {
     policy_sha1 = sha1(join("", tolist([for f in fileset("${path.module}/ansible/", "*") : file("${path.module}/ansible/${f}")])))
   }
-
   provisioner "remote-exec" {
     inline = ["echo \"instance ready!\""]
 
@@ -51,6 +50,7 @@ resource "null_resource" "openvpn-config" {
       private_key = file(var.known-key-pairs[var.instance-config.openvpn.key-name].private-key-file)
     }
   }
+
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${data.aws_eip.openvpn.public_ip},' --extra-var=@${abspath(path.module)}/ansible/tf_openvpn_vars.yml --private-key ${var.known-key-pairs.enrico-mbp.private-key-file} ${abspath(path.module)}/ansible/main.yml"
   }
