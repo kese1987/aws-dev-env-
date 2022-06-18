@@ -30,6 +30,24 @@ module "private-net" {
   subnets          = var.vpc-subnets.private
 }
 
+module "internal_tools" {
+  source = "./private/instances/internal_tools"
+  known-key-pairs = var.known-key-pairs
+  private-dns-zone = {
+    name = aws_route53_zone.private-zone.name
+    id   = aws_route53_zone.private-zone.id
+  }
+  vpc-id           = aws_vpc.enricos-vpc.id
+  private_subnets = concat(tolist([for k,v in var.vpc-subnets.private : v.cidr-block]), tolist([for k,v in var.vpc-subnets.public : v.cidr-block]))
+  instance-config = {
+    internal_tools = merge(
+      tomap({
+        az         = var.az
+        subnet     = module.public-net.subnets[0]
+      }),
+      var.instance-config.internal_tools)
+  }
+}
 
 ############## PUBLIC INSTANCES #########################
 module "public-instances" {

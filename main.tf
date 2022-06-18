@@ -50,6 +50,9 @@ module "vpc" {
       server-private-key = "/usr/local/etc/pki/private/openvpn-server.key"
       server-static-key  = "/usr/local/etc/pki/ta.key"
     }
+    internal_tools = {
+      key-name           = "enrico-mbp"
+    }
   }
 
   az = data.aws_availability_zones.available.names[0]

@@ -42,5 +42,5 @@ variable "known-key-pairs" {
 }
 
 variable "instance-config" {
-  type = map(any)
+  type = any
 }

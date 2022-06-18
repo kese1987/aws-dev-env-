@@ -1,10 +1,5 @@
-
 variable "instance-config" {
   type = any
-}
-
-variable "vpc-id" {
-  type = string
 }
 
 variable "known-key-pairs" {
@@ -18,10 +13,10 @@ variable "private-dns-zone" {
   })
 }
 
-variable "public-dns-zone" {
-  type = object({
-    name = string
-    id   = string
-  })
+variable "vpc-id" {
+  type = string
 }
 
+variable "private_subnets" {
+  type = list(string)
+}
