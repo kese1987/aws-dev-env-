@@ -6,3 +6,4 @@
 *.tfstate
 *.hcl
 *.info
+/ssl_certs/

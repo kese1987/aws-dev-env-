@@ -46,6 +46,8 @@ module "internal_tools" {
       }),
     var.instance-config.internal_tools)
   }
+
+  depends_on = [aws_route53_zone.private-zone]
 }
 
 ############## PUBLIC INSTANCES #########################

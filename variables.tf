@@ -3,6 +3,10 @@ variable "aws-region" {
   default     = "eu-central-1"
 }
 
+variable "aws-profile" {
+  default     = "terraform"
+}
+
 locals {
   known-key-pairs = {
     enrico-mbp = {
