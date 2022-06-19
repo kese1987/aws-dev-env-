@@ -7,6 +7,15 @@ resource "aws_route53_record" "vpn-gw" {
   records = [data.aws_eip.openvpn.public_ip]
 }
 
+resource "aws_route53_record" "internaltools-public" {
+  zone_id = var.public-dns-zone.id
+  name    = "internaltools.${var.public-dns-zone.name}"
+  type    = "A"
+  ttl     = "300"
+  records = [data.aws_eip.openvpn.public_ip]
+}
+
+
 ############# PRIVATE RECORDS
 resource "aws_route53_record" "private-openvpn" {
   zone_id = var.private-dns-zone.id

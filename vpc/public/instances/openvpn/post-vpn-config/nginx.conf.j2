@@ -1,0 +1,8 @@
+server {
+
+    listen 80;
+    location /nexus {
+        proxy_pass http://internaltools.{{ tf_private_dns_zone }}:9090/nexus;
+    }
+
+}

@@ -1,7 +1,7 @@
 tf_vpn_subnet: 255.255.255.0
 tf_vpn_network: 10.0.128.0
 tf_vpn_cidr: 10.0.128.0/24
-tf_cwd: /Users/enrico/git/aws-certified-dev/terraform/vpc/public/instances/openvpn/ansible
+tf_cwd: /Users/enrico/git/aws-certified-dev/terraform/vpc/public/instances/openvpn/vpn-config
 tf_ca_crt: /usr/local/etc/pki/ca.crt
 tf_server_crt: /usr/local/etc/pki/issued/openvpn-server.crt
 tf_server_key: /usr/local/etc/pki/private/openvpn-server.key

@@ -1,0 +1,22 @@
+- name: Install nginix
+  apt:
+    name: nginx
+- name: Disabling web server
+  shell:
+    cmd: |
+      unlink /etc/nginx/sites-enabled/default
+  ignore_errors: yes
+
+- name: Configuring reverse proxy
+  ansible.builtin.template:
+    src: "{{tf_cwd}}/nginx.conf.j2"
+    dest: "/etc/nginx/sites-available/reverse-proxy.conf"
+    owner: ubuntu
+    group: ubuntu
+    mode: '0400'
+- name: Activing reverse proxy
+  shell:
+    cmd: |
+      ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf
+      service nginx configtest
+      service nginx restart

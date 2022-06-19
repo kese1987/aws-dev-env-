@@ -23,7 +23,7 @@ resource "local_file" "openvpn_ansible_vars" {
     tf_vpn_subnet: ${cidrnetmask(var.instance-config.openvpn.vpn-network-cidr)}
     tf_vpn_network: ${regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}", var.instance-config.openvpn.vpn-network-cidr)}
     tf_vpn_cidr: ${var.instance-config.openvpn.vpn-network-cidr}
-    tf_cwd: ${abspath(path.module)}/ansible
+    tf_cwd: ${abspath(path.module)}/vpn-config
     tf_ca_crt: ${var.instance-config.openvpn.ca-crt}
     tf_server_crt: ${var.instance-config.openvpn.server-crt}
     tf_server_key: ${var.instance-config.openvpn.server-private-key}
@@ -32,13 +32,48 @@ resource "local_file" "openvpn_ansible_vars" {
     tf_dns_server: ${var.instance-config.openvpn.dns-server}
     tf_private_dns_zone: ${var.private-dns-zone.name}
   DOC
-  filename = "${abspath(path.module)}/ansible/vars/tf_openvpn_vars.yml"
+  filename = "${abspath(path.module)}/vpn-config/vars/tf_openvpn_vars.yml"
+}
+
+resource "local_file" "openvpn_post_vpn_ansible_vars" {
+  content  = <<-DOC
+    tf_cwd: ${abspath(path.module)}/post-vpn-config
+    tf_private_dns_zone: ${var.private-dns-zone.name}
+    tf_public_dns_zone: ${var.public-dns-zone.name}
+  DOC
+  filename = "${abspath(path.module)}/post-vpn-config/vars/tf_openvpn_vars.yml"
+}
+
+resource "null_resource" "openvpn-config-via-vpn"{
+
+  triggers = {
+    policy_sha1 = sha1(join("", tolist([for f in fileset("${path.module}/post-vpn-config/", "*") : file("${path.module}/post-vpn-config/${f}")])))
+  }
+  provisioner "remote-exec" {
+    inline = ["echo \"instance ready!\""]
+
+    connection {
+      host        = aws_instance.openvpn.private_ip
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.known-key-pairs[var.instance-config.openvpn.key-name].private-key-file)
+    }
+  }
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${aws_instance.openvpn.private_ip},' --extra-var=@${abspath(path.module)}/post-vpn-config/vars/tf_openvpn_vars.yml --private-key ${var.known-key-pairs.enrico-mbp.private-key-file} ${abspath(path.module)}/post-vpn-config/main.yml"
+  }
+
+  depends_on = [
+    aws_eip_association.openvpn-assoc,
+    aws_instance.openvpn
+  ]
+
 }
 
 resource "null_resource" "openvpn-config" {
 
   triggers = {
-    policy_sha1 = sha1(join("", tolist([for f in fileset("${path.module}/ansible/", "*") : file("${path.module}/ansible/${f}")])))
+    policy_sha1 = sha1(join("", tolist([for f in fileset("${path.module}/vpn-config/", "*") : file("${path.module}/vpn-config/${f}")])))
   }
   provisioner "remote-exec" {
     inline = ["echo \"instance ready!\""]
@@ -51,7 +86,7 @@ resource "null_resource" "openvpn-config" {
     }
   }
   provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${data.aws_eip.openvpn.public_ip},' --extra-var=@${abspath(path.module)}/ansible/vars/tf_openvpn_vars.yml --private-key ${var.known-key-pairs.enrico-mbp.private-key-file} ${abspath(path.module)}/ansible/main.yml"
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${data.aws_eip.openvpn.public_ip},' --extra-var=@${abspath(path.module)}/vpn-config/vars/tf_openvpn_vars.yml --private-key ${var.known-key-pairs.enrico-mbp.private-key-file} ${abspath(path.module)}/vpn-config/main.yml"
   }
 
   depends_on = [
@@ -73,6 +108,14 @@ resource "aws_security_group" "openvpn-sg" {
   ingress {
     from_port        = 22
     to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    from_port        = 80
+    to_port          = 80
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
